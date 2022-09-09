@@ -1,8 +1,8 @@
 require_relative 'spec_helper'
 
-describe Model1 do
+describe City do
   it "should " do
-    obj = Model1.new
+    obj = City.new
     obj.id.must_be_nil
     # ...
   end
