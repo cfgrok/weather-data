@@ -1,0 +1,11 @@
+select name, lat, long, month, average_high, record_high, lowest_high, ceil(high_days * 1000 / (high_days + non_high_days)) / 10 as days_over_80, ceil(low_days * 1000 / (low_days + non_low_days)) / 10 as days_below_30, average_low, record_low, highest_low from (
+select c.id as city_id, c.name, c.lat, c.long, to_char(r.date, 'Month') as month, date_part('month', r.date) as month_number, round(avg(r.max_temp)) as average_high, round(max(r.max_temp)) as record_high, round(min(r.max_temp)) as lowest_high, round(avg(r.min_temp)) as average_low, round(min(r.min_temp)) as record_low, round(max(r.min_temp)) as highest_low from readings r inner join cities c on r.city_id = c.id where r.date >= '2000-01-01' group by c.id, c.name, c.lat, c.long, date_part('month', r.date), to_char(r.date, 'Month') order by c.name, month_number
+) main
+left join (select city_id, date_part('month', date) as month_number, cast(count(1) as double precision) as high_days from readings inner join cities on city_id = cities.id where max_temp >= 80 and date >= '2000-01-01' group by city_id, name, date_part('month', date) order by name, month_number) sub1
+on main.city_id = sub1.city_id and main.month_number = sub1.month_number
+left join (select city_id, date_part('month', date) as month_number, count(1) as non_high_days from readings inner join cities on city_id = cities.id where max_temp < 80 and date >= '2000-01-01' group by city_id, name, date_part('month', date) order by name, month_number) sub2
+on main.city_id = sub2.city_id and main.month_number = sub2.month_number
+left join (select city_id, date_part('month', date) as month_number, cast(count(1) as double precision) as low_days from readings inner join cities on city_id = cities.id where max_temp <= 30 and date >= '2000-01-01' group by city_id, name, date_part('month', date) order by name, month_number) sub3
+on main.city_id = sub3.city_id and main.month_number = sub3.month_number
+left join (select city_id, date_part('month', date) as month_number, cast(count(1) as double precision) as non_low_days from readings inner join cities on city_id = cities.id where max_temp > 30 and date >= '2000-01-01' group by city_id, name, date_part('month', date) order by name, month_number) sub4
+on main.city_id = sub4.city_id and main.month_number = sub4.month_number;

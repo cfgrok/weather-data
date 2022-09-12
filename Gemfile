@@ -10,8 +10,12 @@ gem 'sequel_pg', '>= 1.8', require: 'sequel'
 gem 'rack-unreloader', '>= 1.8'
 gem 'rake'
 gem 'rackup'
+gem 'puma'
+gem 'csv'
 
 group :development do
+  gem 'pry'
+  gem 'reline', '0.3.1'
   gem 'sequel-annotate'
   gem 'simplecov'
 end

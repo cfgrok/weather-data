@@ -1,8 +1,8 @@
 require_relative 'spec_helper'
 
-describe '/prefix1' do
+describe '/city' do
   it "should " do
-    visit '/prefix1'
+    visit '/city'
     page.title.must_equal 'WeatherData'
     # ...
   end
